@@ -28,6 +28,7 @@ public class Cliente extends javax.swing.JFrame  {
     FTPClient client = new FTPClient();
     FileInputStream fis = null;
     DefaultTreeModel clientModel;
+    String user;
     /**
      * Creates new form Cliente
      */
@@ -43,7 +44,20 @@ public class Cliente extends javax.swing.JFrame  {
         jTree1.setShowsRootHandles(true);
         CreateChildNodes ccn = 
                 new CreateChildNodes(fileRoot, root);
-        new Thread(ccn).start();
+        ccn.run();
+        
+    }
+    
+    private void createtree(String path){
+        File fileRoot = new File(path);
+        root = new DefaultMutableTreeNode(new FileNode(fileRoot));
+         model = new DefaultTreeModel(root);
+
+        jTree1.setModel(model);
+        jTree1.setShowsRootHandles(true);
+        CreateChildNodes ccn = 
+                new CreateChildNodes(fileRoot, root);
+        new Thread(ccn).run();
     }
     
     private void setClienteTree(String path){
@@ -56,44 +70,11 @@ public class Cliente extends javax.swing.JFrame  {
         clientTree.setEnabled(true);
         CreateChildNodes ccn = 
                 new CreateChildNodes(fileRoot, clientRoot);
-        new Thread(ccn).start();
+        new Thread(ccn).run();
         
         
     }
-
-     public class CreateChildNodes implements Runnable {
-
-        private DefaultMutableTreeNode root;
-
-        private File fileRoot;
-
-        public CreateChildNodes(File fileRoot, 
-                DefaultMutableTreeNode root) {
-            this.fileRoot = fileRoot;
-            this.root = root;
-        }
-
-        @Override
-        public void run() {
-            createChildren(fileRoot, root);
-        }
-
-        private void createChildren(File fileRoot, 
-                DefaultMutableTreeNode node) {
-            File[] files = fileRoot.listFiles();
-            if (files == null) return;
-
-            for (File file : files) {
-                DefaultMutableTreeNode childNode = 
-                        new DefaultMutableTreeNode(new FileNode(file));
-                node.add(childNode);
-                if (file.isDirectory()) {
-                    createChildren(file, childNode);
-                }
-            }
-        }
-
-    }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -110,12 +91,12 @@ public class Cliente extends javax.swing.JFrame  {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         name_tf = new javax.swing.JTextField();
-        pass_tf = new javax.swing.JTextField();
         jScrollPane2 = new javax.swing.JScrollPane();
         clientTree = new javax.swing.JTree();
         btn_logOut = new javax.swing.JButton();
         btn_download = new javax.swing.JButton();
         btn_upload = new javax.swing.JButton();
+        pwd_tf = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -167,23 +148,23 @@ public class Cliente extends javax.swing.JFrame  {
                         .addGap(224, 224, 224)
                         .addComponent(btn_download))
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(27, 27, 27)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(85, 85, 85)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
                         .addGap(23, 23, 23)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(name_tf, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jLabel3)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(pass_tf, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pwd_tf, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(24, 24, 24)
                         .addComponent(btn_login)
                         .addGap(18, 18, 18)
-                        .addComponent(btn_logOut))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(27, 27, 27)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(85, 85, 85)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btn_logOut)))
                 .addContainerGap(46, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -194,10 +175,10 @@ public class Cliente extends javax.swing.JFrame  {
                     .addComponent(jLabel2)
                     .addComponent(name_tf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3)
-                    .addComponent(pass_tf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btn_login)
-                    .addComponent(btn_logOut))
-                .addGap(18, 18, 18)
+                    .addComponent(btn_logOut)
+                    .addComponent(pwd_tf, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(28, 28, 28)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -205,7 +186,7 @@ public class Cliente extends javax.swing.JFrame  {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_upload)
                     .addComponent(btn_download))
-                .addContainerGap(47, Short.MAX_VALUE))
+                .addContainerGap(37, Short.MAX_VALUE))
         );
 
         pack();
@@ -214,12 +195,12 @@ public class Cliente extends javax.swing.JFrame  {
     private void btn_loginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_loginActionPerformed
         //captura datos del cliente 
         String userName = name_tf.getText();
-        String userPass = pass_tf.getText();
+        String userPass = pwd_tf.getText();
         if(userName.equals("") || userPass.equals("")){
             JOptionPane.showMessageDialog(this, "Ingrese Datos para el login");
         }else{
             String ftp = "127.0.0.1";
-            String user = userName;
+             user = userName;
             String password = userPass;
         
         try{
@@ -275,24 +256,27 @@ public class Cliente extends javax.swing.JFrame  {
             TreeNode[] tr = selectednode.getPath();
 
             //crea el path con la direccion completa
-            String path = System.getProperty("user.home")+ "\\Desktop\\ftp\\";
+            String path = "";
             for(int i = 0; i<tr.length; i++ ){
-                path += "\\"+tr[i].toString();
+                path += "/"+tr[i].toString();
             }
-            
-            //archivo a descargar
-            String remoteFile1 = path;
 
-            //archivo destino
-            File downloadFile1 = new File(System.getProperty("user.home")+ "\\Downloads\\"+selectednode.toString());
-            OutputStream outputStream1 = new BufferedOutputStream(new FileOutputStream(downloadFile1));
+            client.setFileType(FTP.BINARY_FILE_TYPE);
+            //archivo a descargar
+            System.out.println("DE: "+path);
+  
+            String destino = System.getProperty("user.home")+ "\\Documents\\"+selectednode.toString();
+            System.out.println(destino);
+            OutputStream fos = new FileOutputStream(destino);
+            
             
             //hace la descarga
-            boolean success = client.retrieveFile(remoteFile1, outputStream1);
-            outputStream1.close();
+            boolean success = client.retrieveFile( selectednode.toString(), fos);
             
             if(success){
                 JOptionPane.showMessageDialog(this, "Se desgargó el archivo");
+                String actualizado = System.getProperty("user.home") + "\\Documents";
+                createtree(actualizado);
             }else{
                 JOptionPane.showMessageDialog(this, "NO Se descargó el archivo");
             }
@@ -327,10 +311,11 @@ public class Cliente extends javax.swing.JFrame  {
             boolean result = client.storeFile(selectednode.toString() , fis);
             if(result){
                 JOptionPane.showMessageDialog(this, "Se cargó el archivo");
-                /*if(selectednode != null){
-                    selectednode.insert(new DefaultMutableTreeNode(selectednode.toString()), selectednode.getIndex(selectednode.getParent()));
-                    clientModel.reload(selectednode);
-                }*/
+                //crea la direccion del directorio
+                String actualizado = System.getProperty("user.home") + "\\Desktop\\ftp\\"+user;
+                
+                //metodo que crea el artbol del cliente
+                setClienteTree(actualizado);
             }else{
                 JOptionPane.showMessageDialog(this, "NO Se cargó el archivo");
             }
@@ -388,6 +373,42 @@ public class Cliente extends javax.swing.JFrame  {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTree jTree1;
     private javax.swing.JTextField name_tf;
-    private javax.swing.JTextField pass_tf;
+    private javax.swing.JPasswordField pwd_tf;
     // End of variables declaration//GEN-END:variables
+
+public class CreateChildNodes extends Thread   {
+
+        private DefaultMutableTreeNode root;
+
+        private File fileRoot;
+
+        public CreateChildNodes(File fileRoot, 
+                DefaultMutableTreeNode root) {
+            this.fileRoot = fileRoot;
+            this.root = root;
+        }
+
+        @Override
+        public void run() {
+            createChildren(fileRoot, root);
+        }
+
+        private void createChildren(File fileRoot, 
+                DefaultMutableTreeNode node) {
+            File[] files = fileRoot.listFiles();
+            if (files == null) return;
+
+            for (File file : files) {
+                DefaultMutableTreeNode childNode = 
+                        new DefaultMutableTreeNode(new FileNode(file));
+                node.add(childNode);
+                if (file.isDirectory()) {
+                    createChildren(file, childNode);
+                }
+            }
+        }
+
+    }//CREATE CHILDREN CLASS
+
+
 }
